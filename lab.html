@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab Editor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <style>
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            width: 150px; /* Fixed width for labels */
+            display: inline-block;
+            text-align: right;
+            margin-right: 10px;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+        /* Adjust text input fields */
+.form-control {
+    width: 100%; /* Set to a fixed value or percentage as needed */
+    text-align: left; /* Align text to the left */
+}
+
+/* Adjust labels */
+label {
+    width: auto; /* Allow labels to take their natural width */
+}
+label[id^="imageLabel"] {
+  text-align: left;
+}
+/* Style for the close icon */
+.close-icon {
+    display: inline-block;
+    font-size: 24px; /* Adjust the font size as needed */
+    cursor: pointer;
+    color: #ff0000; /* Adjust the color as needed */
+    transition: color 0.3s; /* Add a color transition effect */
+}
+
+/* Hover effect for the close icon */
+.close-icon:hover {
+    color: #ff6666; /* Adjust the hover color as needed */
+}
+fieldset {
+    border: 2px solid #ccc;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+/* Add a border around each question within an activity */
+fieldset.question {
+    border: 2px solid #333 !important; /* Increase border width for questions */
+    padding: 10px;
+    margin-top: 10px;
+    border-width: thick;
+}
+
+    
+      
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center display-4 text-white" style="background-color: rgb(22, 3, 80); padding: 10px;"><b>LAB EDITOR</b></h1>
+        <form id="labForm">
+            <div class="form-group">
+                
+                <label for="labId">Lab ID:</label>
+                <input type="number" class="form-control" id="labId" name="labId" required>
+
+            </div>
+            <div class="form-group">
+                <label for="labName">Lab Name:</label>
+                <input type="text" class="form-control" id="labName" name="labName" required>
+            </div>
+            <div class="form-group">
+                <label for="labTitle">Lab Title:</label>
+                <input type="text" class="form-control" id="labTitle" name="labTitle" required>
+            </div>
+            <div class="form-group">
+                <label for="labScenario">Scenario:</label>
+                <textarea class="form-control" id="labScenario" name="labScenario" rows="4"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="labObjective">Objective:</label>
+                <textarea class="form-control" id="labObjective" name="labObjective" rows="4"></textarea>
+            </div>
+            <div id="activities">
+                <!-- Activity fields will be dynamically generated using JavaScript -->
+            </div>
+
+            <br/>
+            <div class="float-end">
+            <button type="button" class="btn btn-primary btn-lg" onclick="addActivity()">Add Activity</button>
+            <button type="button" class="btn btn-success btn-lg" onclick="saveLab()">Save Lab    </button>
+        </div>
+        </form>
+    </div>
+
+    <script>
+      let activityCount = 0; // Initialize activity count
+  
+      <!-- ... (previous code) -->
+  
+  // Function to add an activity field
+  // Function to add an activity field
+  function addActivity() {
+      activityCount++;
+  
+      const activitiesDiv = document.getElementById('activities');
+  
+      const activityFieldset = document.createElement('fieldset');
+      activityFieldset.setAttribute('id', `activity${activityCount}`); // Assign a unique ID
+      activityFieldset.innerHTML = `
+          <legend>Activity ${activityCount}</legend>
+          <label for="activityId${activityCount}">ID:</label>
+          <input type="number" id="activityId${activityCount}" name="activityId${activityCount}" value="${activityCount}" disabled><br><br>
+          <label for="activityTitle${activityCount}">Activity Title:</label>
+          <input class="form-control" type="text" id="activityTitle${activityCount}" name="activityTitle${activityCount}" required><br><br>
+          <label for="activityDescription${activityCount}">Activity Description:</label>
+          <textarea class="form-control" id="activityDescription${activityCount}" name="activityDescription${activityCount}" rows="4" required></textarea><br><br>
+          <div id="questions${activityCount}">
+              <!-- Question fields will be dynamically generated using JavaScript -->
+          </div>
+          <button class="btn btn-warning btn-lg" type="button" onclick="addQuestion(${activityCount})">Add Question</button>
+          <button class="btn btn-danger btn-lg" type="button" onclick="removeActivity(${activityCount})">Remove Activity</button>
+
+      `;
+  
+      activitiesDiv.appendChild(activityFieldset);
+  }
+  function removeActivity(activityNumber) {
+    const activitiesDiv = document.getElementById('activities');
+    const activityFieldset = document.getElementById(`activity${activityNumber}`);
+
+    if (activityFieldset) {
+        activitiesDiv.removeChild(activityFieldset);
+        activityCount--; // Decrement the activityCount
+        // When removing an activity, also remove all its associated questions
+        const questionsDiv = document.getElementById(`questions${activityNumber}`);
+        questionsDiv.innerHTML = ''; // Remove all child elements
+    }
+}
+
+
+  
+  
+  
+  
+  
+  // Function to add a question field within an activity
+  function addQuestion(activityNumber) {
+      const questionsDiv = document.getElementById(`questions${activityNumber}`);
+      const questionCount = questionsDiv.children.length + 1;
+  
+      const questionFieldset = document.createElement('fieldset');
+      questionFieldset.setAttribute('id', `questionFieldset${activityNumber}_${questionCount}`); // Assign a unique ID
+      questionFieldset.innerHTML = `
+
+        <div class="close-icon float-end" onclick="removeQuestion(${activityNumber}, ${questionCount})">❌</div><br/>
+
+
+
+          <legend>Question ${questionCount}</legend>
+          <label for="questionType${activityNumber}_${questionCount}">Question Type:</label>
+          <select id="questionType${activityNumber}_${questionCount}" name="questionType${activityNumber}_${questionCount}" required onchange="toggleOptionsInput(${activityNumber}, ${questionCount})">
+              <option value="text">Text</option>
+              <option value="mcq">Multiple Choice</option>
+              <option value="inst">Instruction</option>
+
+          </select><br><br>
+          <label for="questionText${activityNumber}_${questionCount}">Question:</label>
+          <textarea class="form-control" id="questionText${activityNumber}_${questionCount}" name="questionText${activityNumber}_${questionCount}" rows="4" required></textarea><br><br>
+          <label for="questionOptions${activityNumber}_${questionCount}" id="optionsLabel${activityNumber}_${questionCount}" style="display: none;">Options (comma-separated, for MCQ):</label>
+          <input class="form-control" type="text" id="questionOptions${activityNumber}_${questionCount}" name="questionOptions${activityNumber}_${questionCount}" style="display: none;"><br><br>
+          <label for="questionAnswer${activityNumber}_${questionCount}">Correct Answer:</label>
+          <input class="form-control" type="text" id="questionAnswer${activityNumber}_${questionCount}" name="questionAnswer${activityNumber}_${questionCount}" required><br><br>
+          <label for="questionInfo${activityNumber}_${questionCount}">Additional Info:</label>
+          <textarea class="form-control" id="questionInfo${activityNumber}_${questionCount}" name="questionInfo${activityNumber}_${questionCount}" rows="4"></textarea><br><br>
+          <label for="includeImage${activityNumber}_${questionCount}">Include Image:</label>
+          <input  type="checkbox" id="includeImage${activityNumber}_${questionCount}" name="includeImage${activityNumber}_${questionCount}" onchange="toggleImageInput(${activityNumber}, ${questionCount})"><br><br>
+          <label for="questionImage${activityNumber}_${questionCount}" id="imageLabel${activityNumber}_${questionCount}" style="display: none;">Image Name:</label>
+          <input class="form-control" type="text" id="questionImage${activityNumber}_${questionCount}" name="questionImage${activityNumber}_${questionCount}" style="display: none;"><br><br>
+
+          `;
+  
+      questionsDiv.appendChild(questionFieldset);
+  }
+  
+  
+  function removeQuestion(activityNumber, questionNumber) {
+    const questionsDiv = document.getElementById(`questions${activityNumber}`);
+    const questionFieldset = document.getElementById(`questionFieldset${activityNumber}_${questionNumber}`);
+
+    if (questionFieldset) {
+        questionsDiv.removeChild(questionFieldset);
+    }
+}
+
+
+  
+  // Function to toggle the visibility of the image input based on the checkbox
+  function toggleImageInput(activityNumber, questionNumber) {
+      const includeImageCheckbox = document.getElementById(`includeImage${activityNumber}_${questionNumber}`);
+      const imageLabel = document.getElementById(`imageLabel${activityNumber}_${questionNumber}`);
+      const imageInput = document.getElementById(`questionImage${activityNumber}_${questionNumber}`);
+  
+      if (includeImageCheckbox.checked) {
+          imageLabel.style.display = 'block';
+          imageInput.style.display = 'block';
+      } else {
+          imageLabel.style.display = 'none';
+          imageInput.style.display = 'none';
+      }
+  }
+  
+  
+  // ... (rest of the code remains the same)
+  
+  // Function to toggle the visibility of the "Options" input based on the selected question type
+  
+  function toggleOptionsInput(activityNumber, questionNumber) {
+    const questionTypeSelect = document.getElementById(`questionType${activityNumber}_${questionNumber}`);
+    const optionsLabel = document.getElementById(`optionsLabel${activityNumber}_${questionNumber}`);
+    const optionsInput = document.getElementById(`questionOptions${activityNumber}_${questionNumber}`);
+    const answerInput = document.getElementById(`questionAnswer${activityNumber}_${questionNumber}`);
+
+    if (questionTypeSelect.value === 'mcq') {
+        optionsLabel.style.display = 'block';
+        optionsInput.style.display = 'block';
+    } else if (questionTypeSelect.value === 'inst') {
+        optionsLabel.style.display = 'none';
+        optionsInput.style.display = 'none';
+        answerInput.disabled = true; // Enable the answer input for Instruction
+    } else {
+        optionsLabel.style.display = 'none';
+        optionsInput.style.display = 'none';
+        answerInput.disabled = false; // Enable the answer input for Text
+    }
+}
+  
+  // ... (rest of the code remains the same)
+  
+  
+  // Function to save the lab data as JSON
+  function saveLab() {
+    // Create an array to store activity data
+    const activitiesData = [];
+
+    for (let i = 1; i <= activityCount; i++) {
+        const activityData = {
+            id: document.getElementById(`activityId${i}`).value, // Include the ID
+            title: document.getElementById(`activityTitle${i}`).value,
+            description: document.getElementById(`activityDescription${i}`).value,
+            questions: [],
+        };
+
+        // Get questions within this activity
+        const questionsDiv = document.getElementById(`questions${i}`);
+        for (let j = 1; j <= questionsDiv.children.length; j++) {
+            const questionType = document.getElementById(`questionType${i}_${j}`).value;
+            const questionText = document.getElementById(`questionText${i}_${j}`).value;
+            const questionAnswer = document.getElementById(`questionAnswer${i}_${j}`).value;
+            const questionInfo = document.getElementById(`questionInfo${i}_${j}`).value;
+            const includeImageCheckbox = document.getElementById(`includeImage${i}_${j}`);
+            const questionImage = includeImageCheckbox.checked ? document.getElementById(`questionImage${i}_${j}`).value : false;
+            
+            // Check if the question type is "mcq" to include options
+            const questionOptions = questionType === 'mcq'
+                ? document.getElementById(`questionOptions${i}_${j}`).value.split(',').map(option => option.trim())
+                : undefined;
+
+            activityData.questions.push({
+                type: questionType,
+                text: questionText,
+                options: questionOptions, // Include options if it's a "mcq" question
+                answer: questionAnswer,
+                info: questionInfo,
+                image: questionImage, // Include the image name
+            });
+        }
+
+        activitiesData.push(activityData);
+    }
+
+    // Create the final JSON object including scenario and objective
+    const labData = {
+        labId: document.getElementById('labId').value,
+        labName: document.getElementById('labName').value,
+        labTitle: document.getElementById('labTitle').value,
+        scenario: document.getElementById('labScenario').value,
+        objective: document.getElementById('labObjective').value,
+        activities: activitiesData,
+    };
+
+    // Convert the labData object to JSON
+    const jsonData = JSON.stringify([labData], null, 2);
+
+    // Create a Blob object with the JSON data
+    const blob = new Blob([jsonData], { type: 'application/json' });
+
+    // Create a link element to trigger the download
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'lab_data.json';
+
+    // Trigger a click event on the link to initiate the download
+    a.click();
+}
+
+  
+  </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+</body>
+</html>
